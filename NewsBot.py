@@ -31,7 +31,7 @@ business, entertainment, general, health, science, sports, technology. По ум
             self.send_message(message.chat.id, top_headlines["articles"][i]['title'])
             self.send_message(message.chat.id, top_headlines["articles"][i]['url'])
         if len(top_headlines['articles']) == 0:
-            self.send_message(message.chat.id, "По вашему запросу ничего не найдено. Попробуйте другой запрос.")
+            self.send_message(message.chat.id, "По вашему запросу ничего не найдено. Попробуйте другой запрос или подождите некоторое время, когда новости по вашим параметрам появятся.")
         self.category = None
         self.q = None
         self.sources = None
