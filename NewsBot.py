@@ -12,7 +12,10 @@ class NewsBot(telebot.TeleBot):
 
     
     def start_command(self, message: telebot.types.Message):
-        self.send_message(message.chat.id, "Привет! Я бот, который будет отправлять тебе новости по любой теме из главных новостей мира и твоей страны." )
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("/news")
+        markup.add(button)
+        self.send_message(message.chat.id, "Привет! Я бот, который будет отправлять тебе новости по любой теме из главных новостей мира и твоей страны.", reply_markup=markup)
         self.send_message(message.chat.id, """Вы можете задать:
 1. Категорию новостей:
 business, entertainment, general, health, science, sports, technology. По умолчанию все категории.
