@@ -5,65 +5,175 @@ from newsapi import NewsApiClient
 class NewsBot(telebot.TeleBot):
     def __init__(self, token):
         super().__init__(token)
-        self.newsapi = NewsApiClient(api_key='24e1e7ae37b7406f9d529f9859172fa4')
+        self.newsapi = NewsApiClient(
+            api_key='24e1e7ae37b7406f9d529f9859172fa4')
         self.category = None
         self.q = None
         self.sources = None
+        self.list_of_sorces = {
+            "Google News (Russia)": None,
+            "Лента.ру": 'lenta',
+            "РБК": 'rbc',
+            "RT": 'rt'
+        }
+        self.list_of_categorys = {
+            "Бизнес": 'business',
+            "Развлечение": 'entertainment',
+            "Общее": 'general',
+            "Здоровье": 'health',
+            "Наука": 'science',
+            "Спорт": 'sports',
+            "Технологии": 'technology'
+        }
 
-    
     def start_command(self, message: telebot.types.Message):
+        self.category = None
+        self.q = None
+        self.sources = None
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("/news")
-        markup.add(button)
-        self.send_message(message.chat.id, "Привет! Я бот, который будет отправлять тебе новости по любой теме из главных новостей мира и твоей страны.", reply_markup=markup)
-        self.send_message(message.chat.id, """Вы можете задать:
-1. Категорию новостей:
-business, entertainment, general, health, science, sports, technology. По умолчанию все категории.
-2. Ключевое слово: любое слово на вашем языке. По умолчанию без ключевого слова.
-3. Источники: любой источник, написанное на английском языке и маленькими буквами без капсов. Если название источника состоит из нескольких слов, то нужно писать их через тире без пробелов. К примеру: bbc-news, cnn, meduza и т.д. По умолчанию все источники.""")
-        self.send_message(message.chat.id, "Параметр источников нельзя указывать вместе с ключевым словом и категорией. Либо источник, либо категория и/или ключевое слово.")
-        self.send_message(message.chat.id, "Чтобы получить новости, выбирете команду /news")
-        self.send_message(message.chat.id, """Но перед тем как выбрать команду, введите через пробел сначало источники, затем категорию, затем ключевое слово. Если какой-то параметр не нужен, то напишите 'нет'. 
-Пример: bbc-news нет нет""")
+        button2 = telebot.types.KeyboardButton("Задать источник")
+        button3 = telebot.types.KeyboardButton("Задать категорию")
+        button4 = telebot.types.KeyboardButton("Задать ключевое слово")
+        markup.add(button, button2, button3, button4)
+        self.send_message(
+            message.chat.id,
+            "Привет! Я бот, который будет отправлять тебе новости по любой теме из главных новостей мира и твоей страны.",
+            reply_markup=markup)
+        self.send_message(
+            message.chat.id, """Вы можете задать:
+1. Источники: По умолчанию все источники.
+2. Категорию новостей: По умолчанию все категории.
+3. Ключевое слово: любое слово на вашем языке. По умолчанию без ключевого слова."""
+        )
+        self.send_message(
+            message.chat.id,
+            "Параметр источников нельзя указывать вместе с ключевым словом и категорией. Либо источник, либо категория и/или ключевое слово."
+        )
+        self.send_message(message.chat.id,
+                          "Чтобы получить новости, выбирете команду /news")
+        self.send_message(
+            message.chat.id,
+            "Но перед тем, как получить новости, выбирите параметры запроса. Для этого нажмите на кнопки ниже(если настройки по умолчанию вас устраивает, то можете сразу нажать на кнопку /news)."
+        )
 
-    
     def get_news(self, message: telebot.types.Message):
-        top_headlines = self.newsapi.get_top_headlines(language="ru", category=self.category, q=self.q, sources=self.sources)
-        print(len(top_headlines['articles']))
+        top_headlines = self.newsapi.get_top_headlines(language="ru",
+                                                       category=self.category,
+                                                       q=self.q,
+                                                       sources=self.sources)
         for i in range(len(top_headlines['articles'])):
-            self.send_message(message.chat.id, top_headlines["articles"][i]['title'])
-            self.send_message(message.chat.id, top_headlines["articles"][i]['url'])
+            self.send_message(
+                message.chat.id,
+                f'[Google]({top_headlines["articles"][i]["url"]})',
+                parse_mode='MarkdownV2')
         if len(top_headlines['articles']) == 0:
-            self.send_message(message.chat.id, "По вашему запросу ничего не найдено. Попробуйте другой запрос или подождите некоторое время, когда новости по вашим параметрам появятся.")
+            self.send_message(
+                message.chat.id,
+                "По вашему запросу ничего не найдено. Попробуйте другой запрос или подождите некоторое время, когда новости по вашим параметрам появятся."
+            )
         self.category = None
         self.q = None
         self.sources = None
-        self.send_message(message.chat.id, "Все параметры сброшены по умолчанию. Чтобы получить новости, введите снова параметры и выбирите команду /news")
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("/news")
+        button2 = telebot.types.KeyboardButton("Задать источник")
+        button3 = telebot.types.KeyboardButton("Задать категорию")
+        button4 = telebot.types.KeyboardButton("Задать ключевое слово")
+        markup.add(button, button2, button3, button4)
+        self.send_message(
+            message.chat.id,
+            "Все параметры сброшены по умолчанию. Чтобы получить новости, введите снова параметры и выбирите команду /news",
+            reply_markup=markup)
 
+    def set_sorces(self, message: telebot.types.Message):
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("Google News (Russia)")
+        button2 = telebot.types.KeyboardButton("Лента.ру")
+        button3 = telebot.types.KeyboardButton("РБК")
+        button4 = telebot.types.KeyboardButton("RT")
+        markup.add(button, button2, button3, button4)
+        self.send_message(message.chat.id,
+                          "Выбирите источник",
+                          reply_markup=markup)
 
-    def get_text(self, message: telebot.types.Message):
-        message_text = message.text.lower()
-        list_of_parametres = message_text.split()
-        if len(list_of_parametres) != 3:
-            self.send_message(message.chat.id, "Неверный формат ввода. Попробуйте еще раз.")
-        elif list_of_parametres[0] != "нет" and (list_of_parametres[1] != "нет" or list_of_parametres[2] != "нет"):
-            self.send_message(message.chat.id, "Неверный формат ввода. Попробуйте еще раз.")
-        else:
-            list_of_parametres[0].replace(" ", "")
-            list_of_parametres[1].replace(" ", "")
-            list_of_parametres[2].replace(" ", "")
-            if list_of_parametres[0] != "нет":
-                self.sources = list_of_parametres[0]
-            if list_of_parametres[1] != "нет":
-                self.category = list_of_parametres[1]
-            if list_of_parametres[2] != "нет":
-                self.q = list_of_parametres[2]
-            self.send_message(message.chat.id, "Теперь выбирите команду /news")
-        
+    def set_sorces2(self, message: telebot.types.Message):
+        message_text = message.text
+        if message_text in self.list_of_sorces:
+            self.sources = self.list_of_sorces[message_text]
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("/news")
+            markup.add(button)
+            self.send_message(message.chat.id,
+                              "Источник задан. Теперь нажмите кнопку /news",
+                              reply_markup=markup)
+
+    def set_category(self, message: telebot.types.Message):
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("Бизнес")
+        button2 = telebot.types.KeyboardButton("Развлечение")
+        button3 = telebot.types.KeyboardButton("Общее")
+        button4 = telebot.types.KeyboardButton("Здоровье")
+        button5 = telebot.types.KeyboardButton("Наука")
+        button6 = telebot.types.KeyboardButton("Спорт")
+        button7 = telebot.types.KeyboardButton("Технологии")
+        markup.add(button, button2, button3, button4, button5, button6,
+                   button7)
+        self.send_message(message.chat.id,
+                          "Выбирите категорию",
+                          reply_markup=markup)
+
+    def set_category2(self, message: telebot.types.Message):
+        message_text = message.text
+        if message_text in self.list_of_categorys:
+            self.category = self.list_of_categorys[message_text]
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("Задать ключевое слово")
+            button2 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2)
+            self.send_message(
+                message.chat.id,
+                "Категория задана. Вы можете задать ключевое слово или нажать на кнопку /news",
+                reply_markup=markup)
+
+    def set_q(self, message: telebot.types.Message):
+        self.send_message(message.chat.id, "Введите ключевое слово")
+
+    def set_q2(self, message: telebot.types.Message):
+        self.q = message.text
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("Задать категорию")
+        button2 = telebot.types.KeyboardButton("/news")
+        markup.add(button, button2)
+        self.send_message(
+            message.chat.id,
+            "Ключевое слово задано. Вы можете задать категорию или нажать на кнопку /news",
+            reply_markup=markup)
+
     def run(self):
         self.register_message_handler(self.start_command, commands=["start"])
         self.register_message_handler(self.get_news, commands=["news"])
-        self.register_message_handler(self.get_text, content_types=["text"])
+        self.register_message_handler(
+            self.set_sorces,
+            func=lambda message: message.text == 'Задать источник')
+        self.register_message_handler(
+            self.set_sorces2,
+            func=lambda message: message.text in self.list_of_sorces)
+        self.register_message_handler(
+            self.set_category,
+            func=lambda message: message.text == 'Задать категорию')
+        self.register_message_handler(
+            self.set_category2,
+            func=lambda message: message.text in self.list_of_categorys)
+        self.register_message_handler(
+            self.set_q,
+            func=lambda message: message.text == 'Задать ключевое слово')
+        self.register_message_handler(
+            self.set_q2,
+            func=lambda message: message.text != 'Задать ключевое слово' and
+            message.text != 'Задать категорию' and message.text !=
+            'Задать источник' and message.text not in self.list_of_sorces and
+            message.text not in self.list_of_categorys)
         self.polling(none_stop=True, interval=0)
 
 
