@@ -7,9 +7,12 @@ class NewsBot(telebot.TeleBot):
         super().__init__(token)
         self.newsapi = NewsApiClient(
             api_key='24e1e7ae37b7406f9d529f9859172fa4')
+        self.more_news = False
         self.category = None
         self.q = None
         self.sources = None
+        self.sources_more_news = None
+        self.q_more_news = None
         self.list_of_sorces = {
             "Google News (Russia) - по умолчанию": None,
             "Лента.ру": 'lenta',
@@ -26,11 +29,9 @@ class NewsBot(telebot.TeleBot):
             "Технологии": 'technology'
         }
 
-    
+
     def start_command(self, message: telebot.types.Message):
-        self.category = None
-        self.q = None
-        self.sources = None
+        self.more_news = False
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("Задать источник")
         button2 = telebot.types.KeyboardButton("Задать категорию")
@@ -54,8 +55,9 @@ class NewsBot(telebot.TeleBot):
         self.send_message(message.chat.id,
                           "Чтобы узнать найстроки параметров и получить новости, выбирете команду /news")
 
-    
+
     def get_news(self, message: telebot.types.Message):
+        self.more_news = False
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         if self.sources is not None:
             button = telebot.types.KeyboardButton("Задать источник")
@@ -80,6 +82,25 @@ class NewsBot(telebot.TeleBot):
         self.send_message(message.chat.id, "Если вы хотите изменить параметры запроса, нажмите на кнопки ниже, иначе нажмите на кнопку 'Получить новости'", reply_markup=markup)
 
     def get_news2(self, message: telebot.types.Message):
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        buttonsp = telebot.types.KeyboardButton("/more_news")
+        if self.sources is not None:
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3)
+        elif self.category is not None:
+            button = telebot.types.KeyboardButton("Задать категорию")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3)
+        else:
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать категорию")
+            button3 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button4 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3, button4)
+        markup.add(buttonsp)
         top_headlines = self.newsapi.get_top_headlines(language="ru",
             category=self.category,
             q=self.q,
@@ -88,12 +109,58 @@ class NewsBot(telebot.TeleBot):
             self.send_message(
         message.chat.id,
         f'[Посмотреть]({top_headlines["articles"][i]["url"]})',
-        parse_mode='MarkdownV2')
+        parse_mode='MarkdownV2', reply_markup=markup)
         if len(top_headlines['articles']) == 0:
             self.send_message(message.chat.id,
-        "По вашему запросу ничего не найдено. Попробуйте другой запрос или подождите некоторое время, когда новости по вашим параметрам появятся.")
+        "По вашему запросу ничего не найдено. Попробуйте другой запрос, или подождите некоторое время, когда новости по вашим параметрам появятся, или вы можете воспользоватся функцией поиска всех новостей за более давний строк. По этой функцией вы не можете задать категорию новостей, только источник и/или ключевое слово. Также вы не можете по этой функцией отправить запрос по умолчанию, хотя 1 пункт должен быть задан настройкой не по умолчанию. Нажмите на /more_news, чтобы воспользоватся данной функцией", reply_markup=markup)
+        else:
+            self.send_message(message.chat.id, "Если вы хотите получить больше новостей, то попробуйте другой запрос, или подождите некоторое время, когда новости по вашим параметрам появятся, или вы можете воспользоватся функцией поиска всех новостей за более давний строк. По этой функцией вы не можете задать категорию новостей, только источник и/или ключевое слово. Нажмите на /more_news, чтобы воспользоватся данной функцией", reply_markup=markup)
 
-        
+    def get_news3(self, message: telebot.types.Message):
+        self.more_news = True
+        self.sources_more_news = self.sources
+        self.q_more_news = self.q
+        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button = telebot.types.KeyboardButton("Задать источник")
+        button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+        button3 = telebot.types.KeyboardButton("Получить новости")
+        markup.add(button, button2, button3)
+        self.send_message(message.chat.id, "Вы попали в раздел поиска всех новостей по вашим параметрам. Вы можете задать источник и/или ключевое слово. Параметры в этом разделе поиска копируются с параметрами запроса общего поиска, но при изменении их в этом разделе, они не будут сохранены в параметры общего поиска. Если вы хотите изменить параметры запроса, нажмите на кнопки ниже, иначе нажмите на кнопку 'Получить новости'", reply_markup=markup)
+        self.send_message(message.chat.id, f"""Запрос задан по следующим параметрам:
+1. Источник: {next((key for key, value in self.list_of_sorces.items() if value == self.sources_more_news))}
+2. Ключевое слово: {self.q_more_news if self.q is not None else "Без ключевого слова"}""")
+
+    def get_news4(self, message: telebot.types.Message):
+        self.more_news = False
+        if self.sources is not None:
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3)
+        elif self.category is not None:
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("Задать категорию")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3)
+        else:
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать категорию")
+            button3 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button4 = telebot.types.KeyboardButton("/news")
+            markup.add(button, button2, button3, button4)
+        all_articles = self.newsapi.get_everything(sources=self.sources_more_news, q=self.q_more_news)
+        for i in range(len(all_articles['articles'])):
+            self.send_message(
+        message.chat.id,
+        f'[Посмотреть]({all_articles["articles"][i]["url"]})',
+        parse_mode='MarkdownV2', reply_markup=markup)
+        if len(all_articles['articles']) == 0:
+            self.send_message(message.chat.id, "По вашему запросу ничего не найдено. Попробуйте другой запрос.", reply_markup=markup)
+
+            
     def set_sorces(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("Google News (Russia) - по умолчанию")
@@ -107,7 +174,7 @@ class NewsBot(telebot.TeleBot):
 
     def set_sorces2(self, message: telebot.types.Message):
         message_text = message.text
-        if message_text in self.list_of_sorces:
+        if message_text in self.list_of_sorces and self.more_news is False:
             self.sources = self.list_of_sorces[message_text]
             markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
             if self.sources is not None:
@@ -124,8 +191,17 @@ class NewsBot(telebot.TeleBot):
             self.send_message(message.chat.id,
                               "Источник задан. Если вы хотите указать категорию, то верните значение источника по умолчанию, иначе вы можете нажать на кнопку /news.",
                               reply_markup=markup)
+        elif message_text in self.list_of_sorces and self.more_news is True:
+            self.sources_more_news = self.list_of_sorces[message_text]
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/more_news")
+            markup.add(button, button2, button3)
+            self.send_message(message.chat.id, "Источник задан.", reply_markup=markup)
+            
 
-    
+
     def set_category(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("Бизнес")
@@ -162,7 +238,7 @@ class NewsBot(telebot.TeleBot):
                 "Категория задана. Если вы хотите указать источник, то верните значение по умолчанию, иначе вы можете нажать на кнопку /news.",
                 reply_markup=markup)
 
-    
+
     def set_q(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("Без ключевого слова - по умолчанию")
@@ -170,39 +246,54 @@ class NewsBot(telebot.TeleBot):
         self.send_message(message.chat.id, "Введите ключевое слово", reply_markup=markup)
 
     def set_q2(self, message: telebot.types.Message):
-        if message.text == "Без ключевого слова - по умолчанию":
+        if message.text == "Без ключевого слова - по умолчанию" and self.more_news is False:
             self.q = None
-        else:
+        elif message.text != "Без ключевого слова - по умолчанию" and self.more_news is False:
             self.q = message.text
+        elif message.text == "Без ключевого слова - по умолчанию" and self.more_news is True:
+            self.q_more_news = None
+        elif message.text != "Без ключевого слова - по умолчанию" and self.more_news is True:
+            self.q_more_news = message.text
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-        if self.sources is not None:
-            button = telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button3 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3)
-        elif self.category is not None:
-            button = telebot.types.KeyboardButton("Задать категорию")
-            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button3 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3)
-        else:
-            button = telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.types.KeyboardButton("Задать категорию")
-            button3 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button4 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3, button4)
-        self.send_message(
+        if self.more_news is False:
+            if self.sources is not None:
+                button = telebot.types.KeyboardButton("Задать источник")
+                button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button3 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3)
+            elif self.category is not None:
+                button = telebot.types.KeyboardButton("Задать категорию")
+                button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button3 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3)
+            else:
+                button = telebot.types.KeyboardButton("Задать источник")
+                button2 = telebot.types.KeyboardButton("Задать категорию")
+                button3 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button4 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3, button4)
+            self.send_message(
                 message.chat.id,
                 "Ключевое слово задано. Если вы хотите указать источник или категорию, то нажмите на кнопки ниже, иначе вы можете нажать на кнопку /news.",
                 reply_markup=markup)
+        else:
+            button = telebot.types.KeyboardButton("Задать источник")
+            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+            button3 = telebot.types.KeyboardButton("/more_news")
+            markup.add(button, button2, button3)
+            self.send_message(message.chat.id, "Ключевое слово задано.", reply_markup=markup)
 
-        
+
     def run(self):
         self.register_message_handler(self.start_command, commands=["start"])
         self.register_message_handler(self.get_news, commands=["news"])
         self.register_message_handler(
             self.get_news2,
-            func=lambda message: message.text == 'Получить новости')
+            func=lambda message: message.text == 'Получить новости' and self.more_news is False)
+        self.register_message_handler(self.get_news3, commands=["more_news"])
+        self.register_message_handler(
+            self.get_news4,
+            func=lambda message: message.text == 'Получить новости' and self.more_news is True)
         self.register_message_handler(
             self.set_sorces,
             func=lambda message: message.text == 'Задать источник')
@@ -225,7 +316,6 @@ class NewsBot(telebot.TeleBot):
             'Задать источник' and message.text not in self.list_of_sorces and
             message.text not in self.list_of_categorys and message.text != "Получить новости")
         self.polling(none_stop=True, interval=0)
-
 
 
     
