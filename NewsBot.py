@@ -90,6 +90,8 @@ class NewsBot(telebot.TeleBot):
             reply_markup=markup)
 
     def get_news2(self, message: telebot.types.Message):
+        self.sources_more_news = self.sources
+        self.q_more_news = self.q
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         buttonsp = telebot.types.KeyboardButton("/more_news")
         if self.sources is not None:
@@ -133,8 +135,6 @@ class NewsBot(telebot.TeleBot):
     def get_news3(self, message: telebot.types.Message):
         self.count = 0
         self.more_news = True
-        self.sources_more_news = self.sources
-        self.q_more_news = self.q
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton("Задать источник")
         button2 = telebot.types.KeyboardButton("Задать ключевое слово")
@@ -409,4 +409,5 @@ class NewsBot(telebot.TeleBot):
             message.text not in self.list_of_categorys and message.text !=
             "Получить новости")
         self.polling(none_stop=True, interval=0)
+
 
