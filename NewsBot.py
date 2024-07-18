@@ -151,55 +151,59 @@ class NewsBot(telebot.TeleBot):
         )
 
     def get_news4(self, message: telebot.types.Message):
-        self.more_news = False
-        markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-        if self.sources is not None:
-            button = telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button3 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3)
-        elif self.category is not None:
-            button = telebot.types.KeyboardButton("Задать категорию")
-            button2 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button3 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3)
+        if self.sources_more_news is None and self.q_more_news is None:
+            self.send_message(
+                message.chat.id, "Вы не задали источник и ключевое слово. Задайте хотя бы 1 параметр, чтобы получить новости")
         else:
-            button = telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.types.KeyboardButton("Задать категорию")
-            button3 = telebot.types.KeyboardButton("Задать ключевое слово")
-            button4 = telebot.types.KeyboardButton("/news")
-            markup.add(button, button2, button3, button4)
-        self.all_articles = self.newsapi.get_everything(
-            sources=self.sources_more_news, q=self.q_more_news)
-        if len(self.all_articles['articles']) <= 20:
-            for i in range(len(self.all_articles['articles'])):
+            self.more_news = False
+            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            if self.sources is not None:
+                button = telebot.types.KeyboardButton("Задать источник")
+                button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button3 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3)
+            elif self.category is not None:
+                button = telebot.types.KeyboardButton("Задать категорию")
+                button2 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button3 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3)
+            else:
+                button = telebot.types.KeyboardButton("Задать источник")
+                button2 = telebot.types.KeyboardButton("Задать категорию")
+                button3 = telebot.types.KeyboardButton("Задать ключевое слово")
+                button4 = telebot.types.KeyboardButton("/news")
+                markup.add(button, button2, button3, button4)
+            self.all_articles = self.newsapi.get_everything(
+                sources=self.sources_more_news, q=self.q_more_news)
+            if len(self.all_articles['articles']) <= 20:
+                for i in range(len(self.all_articles['articles'])):
+                    self.send_message(
+                        message.chat.id,
+                        f'[Посмотреть]({self.all_articles["articles"][i]["url"]})',
+                        parse_mode='MarkdownV2',
+                        reply_markup=markup)
+                self.send_message(message.chat.id,
+                                  "Все новости выведены.",
+                                  reply_markup=markup)
+            elif len(self.all_articles['articles']) > 20:
+                buttonsp = telebot.types.KeyboardButton("Получить еще новости")
+                markup.add(buttonsp)
+                for i in range(20):
+                    self.send_message(
+                        message.chat.id,
+                        f'[Посмотреть]({self.all_articles["articles"][i]["url"]})',
+                        parse_mode='MarkdownV2',
+                        reply_markup=markup)
+                self.count += 20
                 self.send_message(
                     message.chat.id,
-                    f'[Посмотреть]({self.all_articles["articles"][i]["url"]})',
-                    parse_mode='MarkdownV2',
+                    f"По вашему запросу было найдено {len(self.all_articles['articles'])} новостей. Сейчас было выведено 20 новостей. Если вы хотите получить еще новости, нажмите на кнопку 'Получить еще новости'. При нажатии на любую другую кнопку, вы выходите из раздела поиска всех новостей.",
                     reply_markup=markup)
-            self.send_message(message.chat.id,
-                              "Все новости выведены.",
-                              reply_markup=markup)
-        elif len(self.all_articles['articles']) > 20:
-            buttonsp = telebot.types.KeyboardButton("Получить еще новости")
-            markup.add(buttonsp)
-            for i in range(20):
+            elif len(self.all_articles['articles']) == 0:
                 self.send_message(
                     message.chat.id,
-                    f'[Посмотреть]({self.all_articles["articles"][i]["url"]})',
-                    parse_mode='MarkdownV2',
+                    "По вашему запросу ничего не найдено. Попробуйте другой запрос.",
                     reply_markup=markup)
-            self.count += 20
-            self.send_message(
-                message.chat.id,
-                f"По вашему запросу было найдено {len(self.all_articles['articles'])} новостей. Сейчас было выведено 20 новостей. Если вы хотите получить еще новости, нажмите на кнопку 'Получить еще новости'. При нажатии на любую другую кнопку, вы выходите из раздела поиска всех новостей.",
-                reply_markup=markup)
-        elif len(self.all_articles['articles']) == 0:
-            self.send_message(
-                message.chat.id,
-                "По вашему запросу ничего не найдено. Попробуйте другой запрос.",
-                reply_markup=markup)
 
     def get_news5(self, message: telebot.types.Message):
         for i in range(self.count, self.count + 20):
@@ -406,4 +410,3 @@ class NewsBot(telebot.TeleBot):
             "Получить новости")
         self.polling(none_stop=True, interval=0)
 
-    
