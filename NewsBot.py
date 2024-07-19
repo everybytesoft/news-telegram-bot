@@ -154,7 +154,9 @@ class NewsBot(telebot.TeleBot):
     def get_news4(self, message: telebot.types.Message):
         if self.sources_more_news is None and self.q_more_news is None:
             self.send_message(
-                message.chat.id, "Вы не задали источник и ключевое слово. Задайте хотя бы 1 параметр, чтобы получить новости")
+                message.chat.id,
+                "Вы не задали источник и ключевое слово. Задайте хотя бы 1 параметр, чтобы получить новости"
+            )
         else:
             self.more_news = False
             markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -410,5 +412,4 @@ class NewsBot(telebot.TeleBot):
             message.text not in self.list_of_categorys and message.text !=
             "Получить новости")
         self.polling(none_stop=True, interval=0)
-
 
