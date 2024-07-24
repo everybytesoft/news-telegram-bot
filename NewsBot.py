@@ -11,6 +11,7 @@ class NewsBot(telebot.TeleBot):
         self.all_articles = {}
         self.count = 0
         self.more_news = False
+        self.flag_for_q = False
         self.category = None
         self.q = None
         self.sources = None
@@ -326,6 +327,7 @@ class NewsBot(telebot.TeleBot):
                 reply_markup=markup)
 
     def set_q(self, message: telebot.types.Message):
+        self.flag_for_q = True
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton(
             "Без ключевого слова - по умолчанию")
@@ -335,6 +337,7 @@ class NewsBot(telebot.TeleBot):
                           reply_markup=markup)
 
     def set_q2(self, message: telebot.types.Message):
+        self.flag_for_q = False
         if message.text == "Без ключевого слова - по умолчанию" and self.more_news is False:
             self.q = None
         elif message.text != "Без ключевого слова - по умолчанию" and self.more_news is False:
@@ -406,10 +409,6 @@ class NewsBot(telebot.TeleBot):
             func=lambda message: message.text == 'Задать ключевое слово')
         self.register_message_handler(
             self.set_q2,
-            func=lambda message: message.text != 'Задать ключевое слово' and
-            message.text != 'Задать категорию' and message.text !=
-            'Задать источник' and message.text not in self.list_of_sorces and
-            message.text not in self.list_of_categorys and message.text !=
-            "Получить новости")
+            func=lambda message: True and self.flag_for_q is True)
         self.polling(none_stop=True, interval=0)
 
