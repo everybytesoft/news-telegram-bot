@@ -28,7 +28,7 @@ class NewsBotForChannel(telebot.TeleBot):
   def Clear_list(self):
     while True:
       sleep(86400)
-      self.list_of_used_news.clear()
+      del self.list_of_used_news[0:len(self.list_of_used_news) - 20]
 
   def run(self):
     Thread(target=self.Clear_list).start()
