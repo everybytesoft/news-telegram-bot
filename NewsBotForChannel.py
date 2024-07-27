@@ -32,5 +32,5 @@ class NewsBotForChannel(telebot.TeleBot):
 
   def run(self):
     Thread(target=self.Clear_list).start()
-    self.send_news(908324504)
+    self.send_news(-1002147192937)
     self.polling(none_stop=True, interval=0)
