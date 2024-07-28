@@ -4,7 +4,7 @@ from time import sleep
 from threading import Thread
 
 
-class NewsBotForChannelru(telebot.TeleBot):
+class NewsBotForChannel_ru(telebot.TeleBot):
 
   def __init__(self, token):
     super().__init__(token)
