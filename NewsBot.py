@@ -143,7 +143,8 @@ class NewsBot(telebot.TeleBot):
             self.list_of_data[
                 message.chat.id]["sources_more_news"] = self.list_of_data[
                     message.chat.id]["sources"]
-            self.q_more_news = self.list_of_data[message.chat.id]["q"]
+            self.list_of_data[message.chat.id][
+                'q_more_news'] = self.list_of_data[message.chat.id]["q"]
         markup = markup = self.buttons2()
         button3 = telebot.types.KeyboardButton("Получить новости")
         markup.add(button3)
@@ -175,8 +176,8 @@ class NewsBot(telebot.TeleBot):
                     sources=self.list_of_data[
                         message.chat.id]["sources_more_news"],
                     q=self.list_of_data[message.chat.id]["q_more_news"])
-            if len(self.list_of_data[message.chat.id]["all_articles"]
-                   ['articles']) <= 20:
+            if 0 < len(self.list_of_data[message.chat.id]["all_articles"]
+                       ['articles']) <= 20:
                 for i in range(
                         len(self.list_of_data[message.chat.id]["all_articles"]
                             ['articles'])):
@@ -321,7 +322,7 @@ class NewsBot(telebot.TeleBot):
         self.list_of_data[message.chat.id]["flag_for_q"] = True
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = telebot.types.KeyboardButton(
-            "Без ключевого слова - по умолчанию")
+            "Без ключевого слова")
         markup.add(button)
         self.send_message(message.chat.id,
                           "Введите ключевое слово",
@@ -329,16 +330,16 @@ class NewsBot(telebot.TeleBot):
 
     def set_q2(self, message: telebot.types.Message):
         self.list_of_data[message.chat.id]["flag_for_q"] = False
-        if message.text == "Без ключевого слова - по умолчанию" and self.list_of_data[
+        if message.text == "Без ключевого слова" and self.list_of_data[
                 message.chat.id]["more_news"] is False:
             self.list_of_data[message.chat.id]["q"] = None
-        elif message.text != "Без ключевого слова - по умолчанию" and self.list_of_data[
+        elif message.text != "Без ключевого слова" and self.list_of_data[
                 message.chat.id]["more_news"] is False:
             self.list_of_data[message.chat.id]["q"] = message.text
-        elif message.text == "Без ключевого слова - по умолчанию" and self.list_of_data[
+        elif message.text == "Без ключевого слова" and self.list_of_data[
                 message.chat.id]["more_news"] is True:
             self.list_of_data[message.chat.id]["q_more_news"] = None
-        elif message.text != "Без ключевого слова - по умолчанию" and self.list_of_data[
+        elif message.text != "Без ключевого слова" and self.list_of_data[
                 message.chat.id]["more_news"] is True:
             self.list_of_data[message.chat.id]["q_more_news"] = message.text
         if self.list_of_data[message.chat.id]["more_news"] is False:
