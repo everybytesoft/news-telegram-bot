@@ -2,6 +2,7 @@ import telebot
 from newsapi import NewsApiClient
 import re
 
+
 class NewsBot(telebot.TeleBot):
 
     def __init__(self, token):
@@ -127,15 +128,15 @@ class NewsBot(telebot.TeleBot):
         for i in range(
                 len(self.list_of_data[message.chat.id]['top_headlines']
                     ['articles'])):
-            data = self.list_of_data[message.chat.id]['top_headlines']['articles'][i]
+            data = self.list_of_data[
+                message.chat.id]['top_headlines']['articles'][i]
             title = self.escape_md(data['title'])
             url = self.escape_md_text_link(data['url'])
 
-            self.send_message(
-                message.chat.id,
-                f'[{title}]({url})', 
-                parse_mode='MarkdownV2',
-                reply_markup=markup)
+            self.send_message(message.chat.id,
+                              f'[{title}]({url})',
+                              parse_mode='MarkdownV2',
+                              reply_markup=markup)
         if len(self.list_of_data[message.chat.id]['top_headlines']
                ['articles']) == 0:
             self.send_message(
@@ -193,11 +194,15 @@ class NewsBot(telebot.TeleBot):
                 for i in range(
                         len(self.list_of_data[message.chat.id]["all_articles"]
                             ['articles'])):
-                    self.send_message(
-                        message.chat.id,
-                        f'[Посмотреть]({self.list_of_data[message.chat.id]["all_articles"]["articles"][i]["url"]})',
-                        parse_mode='MarkdownV2',
-                        reply_markup=markup)
+                    data = self.list_of_data[
+                        message.chat.id]['all_articles']['articles'][i]
+                    title = self.escape_md(data['title'])
+                    url = self.escape_md_text_link(data['url'])
+
+                    self.send_message(message.chat.id,
+                                      f'[{title}]({url})',
+                                      parse_mode='MarkdownV2',
+                                      reply_markup=markup)
                 self.send_message(message.chat.id,
                                   "Все новости выведены.",
                                   reply_markup=markup)
@@ -207,11 +212,15 @@ class NewsBot(telebot.TeleBot):
                     "Получить еще новости")
                 markup.add(buttonsp2)
                 for i in range(20):
-                    self.send_message(
-                        message.chat.id,
-                        f'[Посмотреть]({self.list_of_data[message.chat.id]["all_articles"]["articles"][i]["url"]})',
-                        parse_mode='MarkdownV2',
-                        reply_markup=markup)
+                    data = self.list_of_data[
+                        message.chat.id]['all_articles']['articles'][i]
+                    title = self.escape_md(data['title'])
+                    url = self.escape_md_text_link(data['url'])
+
+                    self.send_message(message.chat.id,
+                                      f'[{title}]({url})',
+                                      parse_mode='MarkdownV2',
+                                      reply_markup=markup)
                 self.list_of_data[message.chat.id]["count"] += 20
                 self.send_message(
                     message.chat.id,
@@ -227,10 +236,14 @@ class NewsBot(telebot.TeleBot):
     def get_news5(self, message: telebot.types.Message):
         for i in range(self.list_of_data[message.chat.id]["count"],
                        self.list_of_data[message.chat.id]["count"] + 20):
-            self.send_message(
-                message.chat.id,
-                f'[Посмотреть]({self.list_of_data[message.chat.id]["all_articles"]["articles"][i]["url"]})',
-                parse_mode='MarkdownV2')
+            data = self.list_of_data[
+                message.chat.id]['all_articles']['articles'][i]
+            title = self.escape_md(data['title'])
+            url = self.escape_md_text_link(data['url'])
+
+            self.send_message(message.chat.id,
+                              f'[{title}]({url})',
+                              parse_mode='MarkdownV2')
             if self.list_of_data[message.chat.id]["all_articles"]["articles"][
                     i] == self.list_of_data[
                         message.chat.id]["all_articles"]["articles"][-1]:
