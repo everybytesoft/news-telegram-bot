@@ -1,6 +1,6 @@
 import telebot
 from newsapi import NewsApiClient
-
+import re
 
 class NewsBot(telebot.TeleBot):
 
@@ -26,6 +26,14 @@ class NewsBot(telebot.TeleBot):
             "Технологии": 'technology',
             "Все категории": None
         }
+
+    def escape_md(self, text: str) -> str:
+        escape_chars = r'_*[]()~`>#+-=|{}.!'
+        return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
+    def escape_md_text_link(self, text: str) -> str:
+        escape_chars = r'\)'
+        return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
     def buttons(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -119,9 +127,13 @@ class NewsBot(telebot.TeleBot):
         for i in range(
                 len(self.list_of_data[message.chat.id]['top_headlines']
                     ['articles'])):
+            data = self.list_of_data[message.chat.id]['top_headlines']['articles'][i]
+            title = self.escape_md(data['title'])
+            url = self.escape_md_text_link(data['url'])
+
             self.send_message(
                 message.chat.id,
-                f'''[Посмотреть]({self.list_of_data[message.chat.id]['top_headlines']["articles"][i]["url"]})''',
+                f'[{title}]({url})', 
                 parse_mode='MarkdownV2',
                 reply_markup=markup)
         if len(self.list_of_data[message.chat.id]['top_headlines']
@@ -321,8 +333,7 @@ class NewsBot(telebot.TeleBot):
     def set_q(self, message: telebot.types.Message):
         self.list_of_data[message.chat.id]["flag_for_q"] = True
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button = telebot.types.KeyboardButton(
-            "Без ключевого слова")
+        button = telebot.types.KeyboardButton("Без ключевого слова")
         markup.add(button)
         self.send_message(message.chat.id,
                           "Введите ключевое слово",
@@ -394,4 +405,5 @@ class NewsBot(telebot.TeleBot):
             func=lambda message: True and self.list_of_data[message.chat.id][
                 "flag_for_q"] is True)
         self.polling(none_stop=True, interval=0)
+
 
