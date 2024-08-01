@@ -2,6 +2,7 @@ import telebot
 from newsapi import NewsApiClient
 from time import sleep
 from threading import Thread
+import re
 
 
 class NewsBotForChannel_ru(telebot.TeleBot):
@@ -13,14 +14,26 @@ class NewsBotForChannel_ru(telebot.TeleBot):
     self.flag = True
     self.flag2 = True
 
+  def escape_md(self, text: str) -> str:
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
+  def escape_md_text_link(self, text: str) -> str:
+    escape_chars = r'\)'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
   def send_news(self, Chat_id):
     while True:
       top_headlines = self.newsapi.get_top_headlines(language="ru")
       for i in range(len(top_headlines['articles'])):
         if top_headlines["articles"][i]["url"] not in self.list_of_used_news:
+          data = top_headlines['articles'][i]
+          title = self.escape_md(data['title'])
+          url = self.escape_md_text_link(data['url'])
+
           self.send_message(
               Chat_id,
-              f'[Посмотреть]({top_headlines["articles"][i]["url"]})',
+              f'[{title}]({url})', 
               parse_mode='MarkdownV2')
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
       sleep(900)
