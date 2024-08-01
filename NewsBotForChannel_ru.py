@@ -3,6 +3,8 @@ from newsapi import NewsApiClient
 from time import sleep
 from threading import Thread
 import re
+from bs4 import BeautifulSoup
+import requests
 
 
 class NewsBotForChannel_ru(telebot.TeleBot):
@@ -25,16 +27,19 @@ class NewsBotForChannel_ru(telebot.TeleBot):
   def send_news(self, Chat_id):
     while True:
       top_headlines = self.newsapi.get_top_headlines(language="ru")
+      url_link = top_headlines['articles'][0]['url']
+      response = requests.get(url_link)
+      soup = BeautifulSoup(response.content, 'html.parser')
+      image = soup.find("meta", property="og:image")
       for i in range(len(top_headlines['articles'])):
         if top_headlines["articles"][i]["url"] not in self.list_of_used_news:
           data = top_headlines['articles'][i]
           title = self.escape_md(data['title'])
           url = self.escape_md_text_link(data['url'])
-
-          self.send_message(
-              Chat_id,
-              f'[{title}]({url})', 
-              parse_mode='MarkdownV2')
+          self.send_photo(Chat_id,
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2')
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
       sleep(900)
 
