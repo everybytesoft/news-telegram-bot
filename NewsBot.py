@@ -1,6 +1,8 @@
 import telebot
 from newsapi import NewsApiClient
 import re
+from bs4 import BeautifulSoup
+import requests
 
 
 class NewsBot(telebot.TeleBot):
@@ -132,11 +134,15 @@ class NewsBot(telebot.TeleBot):
                 message.chat.id]['top_headlines']['articles'][i]
             title = self.escape_md(data['title'])
             url = self.escape_md_text_link(data['url'])
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            image = soup.find("meta", property="og:image")
 
-            self.send_message(message.chat.id,
-                              f'[{title}]({url})',
-                              parse_mode='MarkdownV2',
-                              reply_markup=markup)
+            self.send_photo(message.chat.id,  
+                  image['content'],
+                  f'[{title}]({url})',
+                  parse_mode='MarkdownV2',
+                  reply_markup=markup)
         if len(self.list_of_data[message.chat.id]['top_headlines']
                ['articles']) == 0:
             self.send_message(
@@ -198,11 +204,15 @@ class NewsBot(telebot.TeleBot):
                         message.chat.id]['all_articles']['articles'][i]
                     title = self.escape_md(data['title'])
                     url = self.escape_md_text_link(data['url'])
-
-                    self.send_message(message.chat.id,
-                                      f'[{title}]({url})',
-                                      parse_mode='MarkdownV2',
-                                      reply_markup=markup)
+                    response = requests.get(url)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    image = soup.find("meta", property="og:image")
+    
+                    self.send_photo(message.chat.id,  
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2',
+                          reply_markup=markup)
                 self.send_message(message.chat.id,
                                   "Все новости выведены.",
                                   reply_markup=markup)
@@ -216,11 +226,15 @@ class NewsBot(telebot.TeleBot):
                         message.chat.id]['all_articles']['articles'][i]
                     title = self.escape_md(data['title'])
                     url = self.escape_md_text_link(data['url'])
+                    response = requests.get(url)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    image = soup.find("meta", property="og:image")
 
-                    self.send_message(message.chat.id,
-                                      f'[{title}]({url})',
-                                      parse_mode='MarkdownV2',
-                                      reply_markup=markup)
+                    self.send_photo(message.chat.id,  
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2',
+                          reply_markup=markup)
                 self.list_of_data[message.chat.id]["count"] += 20
                 self.send_message(
                     message.chat.id,
@@ -240,10 +254,14 @@ class NewsBot(telebot.TeleBot):
                 message.chat.id]['all_articles']['articles'][i]
             title = self.escape_md(data['title'])
             url = self.escape_md_text_link(data['url'])
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            image = soup.find("meta", property="og:image")
 
-            self.send_message(message.chat.id,
-                              f'[{title}]({url})',
-                              parse_mode='MarkdownV2')
+            self.send_photo(message.chat.id,  
+                  image['content'],
+                  f'[{title}]({url})',
+                  parse_mode='MarkdownV2')
             if self.list_of_data[message.chat.id]["all_articles"]["articles"][
                     i] == self.list_of_data[
                         message.chat.id]["all_articles"]["articles"][-1]:
@@ -366,6 +384,7 @@ class NewsBot(telebot.TeleBot):
         elif message.text != "Без ключевого слова" and self.list_of_data[
                 message.chat.id]["more_news"] is True:
             self.list_of_data[message.chat.id]["q_more_news"] = message.text
+            
         if self.list_of_data[message.chat.id]["more_news"] is False:
             markup = self.buttons(message)
             buttonsp = telebot.types.KeyboardButton("/news")
@@ -375,7 +394,7 @@ class NewsBot(telebot.TeleBot):
                 "Ключевое слово задано. Если вы хотите указать источник или категорию, то нажмите на кнопки ниже, иначе вы можете нажать на кнопку /news.",
                 reply_markup=markup)
         else:
-            markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            markup = self.buttons2()
             self.buttons2()
             button3 = telebot.types.KeyboardButton("/more_news")
             markup.add(button3)
@@ -418,5 +437,6 @@ class NewsBot(telebot.TeleBot):
             func=lambda message: True and self.list_of_data[message.chat.id][
                 "flag_for_q"] is True)
         self.polling(none_stop=True, interval=0)
+
 
 
