@@ -135,14 +135,53 @@ class NewsBot(telebot.TeleBot):
             title = self.escape_md(data['title'])
             url = self.escape_md_text_link(data['url'])
             response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            image = soup.find("meta", property="og:image")
-
-            self.send_photo(message.chat.id,  
-                  image['content'],
-                  f'[{title}]({url})',
-                  parse_mode='MarkdownV2',
-                  reply_markup=markup)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                image = soup.find("meta", property="og:image")
+                if image:
+                    self.send_photo(message.chat.id,  
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2',
+                          reply_markup=markup)
+                else:
+                    url2 = url[8:]
+                    url_link = url[:8] + url2[:url2.find("/")]
+                    response = requests.get(url_link)
+                    if response.status_code == 200:
+                      soup = BeautifulSoup(response.content, 'html.parser')
+                      image = soup.find("meta", property="og:image")
+                      if image:
+                        self.send_photo(message.chat.id,
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2',
+                          reply_markup=markup)
+                      else:
+                        print("Нет картинки")
+                        print(url_link)
+                    else:
+                      print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                      print(url_link)
+            else:
+                url2 = url[8:]
+                url_link = url[:8] + url2[:url2.find("/")]
+                response = requests.get(url_link)
+                if response.status_code == 200:
+                  soup = BeautifulSoup(response.content, 'html.parser')
+                  image = soup.find("meta", property="og:image")
+                  if image:
+                    self.send_photo(message.chat.id,
+                      image['content'],
+                      f'[{title}]({url})',
+                      parse_mode='MarkdownV2',
+                      reply_markup=markup)
+                  else:
+                    print("Нет картинки")
+                    print(url_link)
+                else:
+                  print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                  print(url_link)
         if len(self.list_of_data[message.chat.id]['top_headlines']
                ['articles']) == 0:
             self.send_message(
@@ -205,14 +244,53 @@ class NewsBot(telebot.TeleBot):
                     title = self.escape_md(data['title'])
                     url = self.escape_md_text_link(data['url'])
                     response = requests.get(url)
-                    soup = BeautifulSoup(response.content, 'html.parser')
-                    image = soup.find("meta", property="og:image")
-    
-                    self.send_photo(message.chat.id,  
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2',
-                          reply_markup=markup)
+                    if response.status_code == 200:
+                        soup = BeautifulSoup(response.content, 'html.parser')
+                        image = soup.find("meta", property="og:image")
+                        if image:
+                            self.send_photo(message.chat.id,  
+                                  image['content'],
+                                  f'[{title}]({url})',
+                                  parse_mode='MarkdownV2',
+                                  reply_markup=markup)
+                        else:
+                            url2 = url[8:]
+                            url_link = url[:8] + url2[:url2.find("/")]
+                            response = requests.get(url_link)
+                            if response.status_code == 200:
+                              soup = BeautifulSoup(response.content, 'html.parser')
+                              image = soup.find("meta", property="og:image")
+                              if image:
+                                self.send_photo(message.chat.id,
+                                  image['content'],
+                                  f'[{title}]({url})',
+                                  parse_mode='MarkdownV2',
+                                  reply_markup=markup)
+                              else:
+                                print("Нет картинки")
+                                print(url_link)
+                            else:
+                              print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                              print(url_link)
+                    else:
+                        url2 = url[8:]
+                        url_link = url[:8] + url2[:url2.find("/")]
+                        response = requests.get(url_link)
+                        if response.status_code == 200:
+                          soup = BeautifulSoup(response.content, 'html.parser')
+                          image = soup.find("meta", property="og:image")
+                          if image:
+                            self.send_photo(message.chat.id,
+                              image['content'],
+                              f'[{title}]({url})',
+                              parse_mode='MarkdownV2',
+                              reply_markup=markup)
+                          else:
+                            print("Нет картинки")
+                            print(url_link)
+                        else:
+                          print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                          print(url_link)
                 self.send_message(message.chat.id,
                                   "Все новости выведены.",
                                   reply_markup=markup)
@@ -227,14 +305,53 @@ class NewsBot(telebot.TeleBot):
                     title = self.escape_md(data['title'])
                     url = self.escape_md_text_link(data['url'])
                     response = requests.get(url)
-                    soup = BeautifulSoup(response.content, 'html.parser')
-                    image = soup.find("meta", property="og:image")
-
-                    self.send_photo(message.chat.id,  
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2',
-                          reply_markup=markup)
+                    if response.status_code == 200:
+                        soup = BeautifulSoup(response.content, 'html.parser')
+                        image = soup.find("meta", property="og:image")
+                        if image:
+                            self.send_photo(message.chat.id,  
+                                  image['content'],
+                                  f'[{title}]({url})',
+                                  parse_mode='MarkdownV2',
+                                  reply_markup=markup)
+                        else:
+                            url2 = url[8:]
+                            url_link = url[:8] + url2[:url2.find("/")]
+                            response = requests.get(url_link)
+                            if response.status_code == 200:
+                              soup = BeautifulSoup(response.content, 'html.parser')
+                              image = soup.find("meta", property="og:image")
+                              if image:
+                                self.send_photo(message.chat.id,
+                                  image['content'],
+                                  f'[{title}]({url})',
+                                  parse_mode='MarkdownV2',
+                                  reply_markup=markup)
+                              else:
+                                print("Нет картинки")
+                                print(url_link)
+                            else:
+                              print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                              print(url_link)
+                    else:
+                        url2 = url[8:]
+                        url_link = url[:8] + url2[:url2.find("/")]
+                        response = requests.get(url_link)
+                        if response.status_code == 200:
+                          soup = BeautifulSoup(response.content, 'html.parser')
+                          image = soup.find("meta", property="og:image")
+                          if image:
+                            self.send_photo(message.chat.id,
+                              image['content'],
+                              f'[{title}]({url})',
+                              parse_mode='MarkdownV2',
+                              reply_markup=markup)
+                          else:
+                            print("Нет картинки")
+                            print(url_link)
+                        else:
+                          print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                          print(url_link)
                 self.list_of_data[message.chat.id]["count"] += 20
                 self.send_message(
                     message.chat.id,
@@ -255,13 +372,50 @@ class NewsBot(telebot.TeleBot):
             title = self.escape_md(data['title'])
             url = self.escape_md_text_link(data['url'])
             response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            image = soup.find("meta", property="og:image")
-
-            self.send_photo(message.chat.id,  
-                  image['content'],
-                  f'[{title}]({url})',
-                  parse_mode='MarkdownV2')
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.content, 'html.parser')
+                image = soup.find("meta", property="og:image")
+                if image:
+                    self.send_photo(message.chat.id,  
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2')
+                else:
+                    url2 = url[8:]
+                    url_link = url[:8] + url2[:url2.find("/")]
+                    response = requests.get(url_link)
+                    if response.status_code == 200:
+                      soup = BeautifulSoup(response.content, 'html.parser')
+                      image = soup.find("meta", property="og:image")
+                      if image:
+                        self.send_photo(message.chat.id,
+                          image['content'],
+                          f'[{title}]({url})',
+                          parse_mode='MarkdownV2')
+                      else:
+                        print("Нет картинки")
+                        print(url_link)
+                    else:
+                      print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                      print(url_link)
+            else:
+                url2 = url[8:]
+                url_link = url[:8] + url2[:url2.find("/")]
+                response = requests.get(url_link)
+                if response.status_code == 200:
+                  soup = BeautifulSoup(response.content, 'html.parser')
+                  image = soup.find("meta", property="og:image")
+                  if image:
+                    self.send_photo(message.chat.id,
+                      image['content'],
+                      f'[{title}]({url})',
+                      parse_mode='MarkdownV2')
+                  else:
+                    print("Нет картинки")
+                    print(url_link)
+                else:
+                  print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                  print(url_link)
             if self.list_of_data[message.chat.id]["all_articles"]["articles"][
                     i] == self.list_of_data[
                         message.chat.id]["all_articles"]["articles"][-1]:
