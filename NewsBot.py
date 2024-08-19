@@ -31,12 +31,14 @@ class NewsBot(telebot.TeleBot):
         }
 
     def escape_md(self, text: str) -> str:
-        escape_chars = r'_*[]()~`>#+-=|{}.!'
-        return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+        if text != None:
+            escape_chars = r'_*[]()~`>#+-=|{}.!'
+            return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
     def escape_md_text_link(self, text: str) -> str:
-        escape_chars = r'\)'
-        return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+        if text != None:
+            escape_chars = r'\)'
+            return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
     def buttons(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -145,6 +147,7 @@ class NewsBot(telebot.TeleBot):
                           parse_mode='MarkdownV2',
                           reply_markup=markup)
                 else:
+                    print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
@@ -164,6 +167,7 @@ class NewsBot(telebot.TeleBot):
                       print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
                       print(url_link)
             else:
+                print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
@@ -254,6 +258,7 @@ class NewsBot(telebot.TeleBot):
                                   parse_mode='MarkdownV2',
                                   reply_markup=markup)
                         else:
+                            print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
@@ -273,6 +278,7 @@ class NewsBot(telebot.TeleBot):
                               print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
                               print(url_link)
                     else:
+                        print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
@@ -315,6 +321,7 @@ class NewsBot(telebot.TeleBot):
                                   parse_mode='MarkdownV2',
                                   reply_markup=markup)
                         else:
+                            print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
@@ -334,6 +341,7 @@ class NewsBot(telebot.TeleBot):
                               print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
                               print(url_link)
                     else:
+                        print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
@@ -381,6 +389,7 @@ class NewsBot(telebot.TeleBot):
                           f'[{title}]({url})',
                           parse_mode='MarkdownV2')
                 else:
+                    print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
@@ -399,6 +408,7 @@ class NewsBot(telebot.TeleBot):
                       print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
                       print(url_link)
             else:
+                print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
