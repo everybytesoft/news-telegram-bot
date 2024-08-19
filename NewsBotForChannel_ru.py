@@ -17,12 +17,14 @@ class NewsBotForChannel_ru(telebot.TeleBot):
     self.flag2 = True
 
   def escape_md(self, text: str) -> str:
-    escape_chars = r'_*[]()~`>#+-=|{}.!'
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    if text != None:
+      escape_chars = r'_*[]()~`>#+-=|{}.!'
+      return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
   def escape_md_text_link(self, text: str) -> str:
-    escape_chars = r'\)'
-    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+    if text != None:
+      escape_chars = r'\)'
+      return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
   def send_news(self, Chat_id):
     while True:
@@ -55,8 +57,10 @@ class NewsBotForChannel_ru(telebot.TeleBot):
                     parse_mode='MarkdownV2')
                 else:
                   print("Нет картинки")
+                  print(url_link)
               else:
                 print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                print(url_link)
           else:
             url2 = url[8:]
             url_link = url[:8] + url2[:url2.find("/")]
@@ -71,8 +75,10 @@ class NewsBotForChannel_ru(telebot.TeleBot):
                   parse_mode='MarkdownV2')
               else:
                 print("Нет картинки")
+                print(url_link)
             else:
               print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+              print(url_link)
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
       sleep(900)
 
