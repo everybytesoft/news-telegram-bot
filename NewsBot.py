@@ -42,30 +42,41 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
     def buttons(self, message: telebot.async_telebot.types.Message):
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True)
         if self.list_of_data[message.chat.id]["sources"] is not None:
-            button = telebot.async_telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.async_telebot.types.KeyboardButton("Задать ключевое слово")
+            button = telebot.async_telebot.types.KeyboardButton(
+                "Задать источник")
+            button2 = telebot.async_telebot.types.KeyboardButton(
+                "Задать ключевое слово")
             markup.add(button, button2)
         elif self.list_of_data[message.chat.id]["category"] is not None:
-            button = telebot.async_telebot.types.KeyboardButton("Задать категорию")
-            button2 = telebot.async_telebot.types.KeyboardButton("Задать ключевое слово")
+            button = telebot.async_telebot.types.KeyboardButton(
+                "Задать категорию")
+            button2 = telebot.async_telebot.types.KeyboardButton(
+                "Задать ключевое слово")
             markup.add(button, button2)
         else:
-            button = telebot.async_telebot.types.KeyboardButton("Задать источник")
-            button2 = telebot.async_telebot.types.KeyboardButton("Задать категорию")
-            button3 = telebot.async_telebot.types.KeyboardButton("Задать ключевое слово")
+            button = telebot.async_telebot.types.KeyboardButton(
+                "Задать источник")
+            button2 = telebot.async_telebot.types.KeyboardButton(
+                "Задать категорию")
+            button3 = telebot.async_telebot.types.KeyboardButton(
+                "Задать ключевое слово")
             markup.add(button, button2, button3)
         return markup
 
     def buttons2(self):
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True)
         button = telebot.async_telebot.types.KeyboardButton("Задать источник")
-        button2 = telebot.async_telebot.types.KeyboardButton("Задать ключевое слово")
+        button2 = telebot.async_telebot.types.KeyboardButton(
+            "Задать ключевое слово")
         markup.add(button, button2)
         return markup
 
-    async def start_command(self, message: telebot.async_telebot.types.Message):
+    async def start_command(self,
+                            message: telebot.async_telebot.types.Message):
         self.list_of_data[message.chat.id] = {
             "top_headlines": {},
             "all_articles": {},
@@ -78,10 +89,13 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             "sources_more_news": None,
             "q_more_news": None
         }
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True)
         button = telebot.async_telebot.types.KeyboardButton("Задать источник")
-        button2 = telebot.async_telebot.types.KeyboardButton("Задать категорию")
-        button3 = telebot.async_telebot.types.KeyboardButton("Задать ключевое слово")
+        button2 = telebot.async_telebot.types.KeyboardButton(
+            "Задать категорию")
+        button3 = telebot.async_telebot.types.KeyboardButton(
+            "Задать ключевое слово")
         button4 = telebot.async_telebot.types.KeyboardButton("/news")
         markup.add(button, button2, button3, button4)
         await self.send_message(
@@ -142,51 +156,79 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                 soup = BeautifulSoup(response.content, 'html.parser')
                 image = soup.find("meta", property="og:image")
                 if image:
-                    await self.send_photo(message.chat.id,  
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2',
-                          reply_markup=markup)
+                    await self.send_photo(message.chat.id,
+                                          image['content'],
+                                          f'[{title}]({url})',
+                                          parse_mode='MarkdownV2',
+                                          reply_markup=markup)
                 else:
                     print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
                     if response.status_code == 200:
-                      soup = BeautifulSoup(response.content, 'html.parser')
-                      image = soup.find("meta", property="og:image")
-                      if image:
-                          await self.send_photo(message.chat.id,
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2',
-                          reply_markup=markup)
-                      else:
-                        print("Нет картинки")
-                        print(url_link)
+                        soup = BeautifulSoup(response.content, 'html.parser')
+                        image = soup.find("meta", property="og:image")
+                        if image:
+                            await self.send_photo(message.chat.id,
+                                                  image['content'],
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2',
+                                                  reply_markup=markup)
+                        else:
+                            with open("растровый6.png", "rb") as image:
+                                await self.send_photo(message.chat.id,
+                                                      image,
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2',
+                                                      reply_markup=markup)
+                            print("Нет картинки")
+                            print(url_link)
                     else:
-                      print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                      print(url_link)
+                        with open("растровый6.png", "rb") as image:
+                            await self.send_photo(message.chat.id,
+                                                  image,
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2',
+                                                  reply_markup=markup)
+                        print(
+                            f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                        )
+                        print(url_link)
             else:
                 print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
                 if response.status_code == 200:
-                  soup = BeautifulSoup(response.content, 'html.parser')
-                  image = soup.find("meta", property="og:image")
-                  if image:
-                      await self.send_photo(message.chat.id,
-                      image['content'],
-                      f'[{title}]({url})',
-                      parse_mode='MarkdownV2',
-                      reply_markup=markup)
-                  else:
-                    print("Нет картинки")
-                    print(url_link)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    image = soup.find("meta", property="og:image")
+                    if image:
+                        await self.send_photo(message.chat.id,
+                                              image['content'],
+                                              f'[{title}]({url})',
+                                              parse_mode='MarkdownV2',
+                                              reply_markup=markup)
+                    else:
+                        with open("растровый6.png", "rb") as image:
+                            await self.send_photo(message.chat.id,
+                                                  image,
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2',
+                                                  reply_markup=markup)
+                        print("Нет картинки")
+                        print(url_link)
                 else:
-                  print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                  print(url_link)
+                    with open("растровый6.png", "rb") as image:
+                        await self.send_photo(message.chat.id,
+                                              image,
+                                              f'[{title}]({url})',
+                                              parse_mode='MarkdownV2',
+                                              reply_markup=markup)
+                    print(
+                        f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                    )
+                    print(url_link)
         if len(self.list_of_data[message.chat.id]['top_headlines']
                ['articles']) == 0:
             await self.send_message(
@@ -253,54 +295,88 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                         soup = BeautifulSoup(response.content, 'html.parser')
                         image = soup.find("meta", property="og:image")
                         if image:
-                            await self.send_photo(message.chat.id,  
-                                  image['content'],
-                                  f'[{title}]({url})',
-                                  parse_mode='MarkdownV2',
-                                  reply_markup=markup)
+                            await self.send_photo(message.chat.id,
+                                                  image['content'],
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2',
+                                                  reply_markup=markup)
                         else:
                             print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
                             if response.status_code == 200:
-                              soup = BeautifulSoup(response.content, 'html.parser')
-                              image = soup.find("meta", property="og:image")
-                              if image:
-                                  await self.send_photo(message.chat.id,
-                                  image['content'],
-                                  f'[{title}]({url})',
-                                  parse_mode='MarkdownV2',
-                                  reply_markup=markup)
-                              else:
-                                print("Нет картинки")
-                                print(url_link)
+                                soup = BeautifulSoup(response.content,
+                                                     'html.parser')
+                                image = soup.find("meta", property="og:image")
+                                if image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image['content'],
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                else:
+                                    with open("растровый6.png", "rb") as image:
+                                        await self.send_photo(
+                                            message.chat.id,
+                                            image,
+                                            f'[{title}]({url})',
+                                            parse_mode='MarkdownV2',
+                                            reply_markup=markup)
+                                    print("Нет картинки")
+                                    print(url_link)
                             else:
-                              print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                              print(url_link)
+                                with open("растровый6.png", "rb") as image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image,
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                print(
+                                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                                )
+                                print(url_link)
                     else:
                         print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
                         if response.status_code == 200:
-                          soup = BeautifulSoup(response.content, 'html.parser')
-                          image = soup.find("meta", property="og:image")
-                          if image:
-                              await self.send_photo(message.chat.id,
-                              image['content'],
-                              f'[{title}]({url})',
-                              parse_mode='MarkdownV2',
-                              reply_markup=markup)
-                          else:
-                            print("Нет картинки")
-                            print(url_link)
+                            soup = BeautifulSoup(response.content,
+                                                 'html.parser')
+                            image = soup.find("meta", property="og:image")
+                            if image:
+                                await self.send_photo(message.chat.id,
+                                                      image['content'],
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2',
+                                                      reply_markup=markup)
+                            else:
+                                with open("растровый6.png", "rb") as image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image,
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                print("Нет картинки")
+                                print(url_link)
                         else:
-                          print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                          print(url_link)
+                            with open("растровый6.png", "rb") as image:
+                                await self.send_photo(message.chat.id,
+                                                      image,
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2',
+                                                      reply_markup=markup)
+                            print(
+                                f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                            )
+                            print(url_link)
                 await self.send_message(message.chat.id,
-                                  "Все новости выведены.",
-                                  reply_markup=markup)
+                                        "Все новости выведены.",
+                                        reply_markup=markup)
             elif len(self.list_of_data[message.chat.id]["all_articles"]
                      ['articles']) > 20:
                 buttonsp2 = telebot.types.KeyboardButton(
@@ -316,51 +392,85 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                         soup = BeautifulSoup(response.content, 'html.parser')
                         image = soup.find("meta", property="og:image")
                         if image:
-                            await self.send_photo(message.chat.id,  
-                                  image['content'],
-                                  f'[{title}]({url})',
-                                  parse_mode='MarkdownV2',
-                                  reply_markup=markup)
+                            await self.send_photo(message.chat.id,
+                                                  image['content'],
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2',
+                                                  reply_markup=markup)
                         else:
                             print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
                             if response.status_code == 200:
-                              soup = BeautifulSoup(response.content, 'html.parser')
-                              image = soup.find("meta", property="og:image")
-                              if image:
-                                  await self.send_photo(message.chat.id,
-                                  image['content'],
-                                  f'[{title}]({url})',
-                                  parse_mode='MarkdownV2',
-                                  reply_markup=markup)
-                              else:
-                                print("Нет картинки")
-                                print(url_link)
+                                soup = BeautifulSoup(response.content,
+                                                     'html.parser')
+                                image = soup.find("meta", property="og:image")
+                                if image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image['content'],
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                else:
+                                    with open("растровый6.png", "rb") as image:
+                                        await self.send_photo(
+                                            message.chat.id,
+                                            image,
+                                            f'[{title}]({url})',
+                                            parse_mode='MarkdownV2',
+                                            reply_markup=markup)
+                                    print("Нет картинки")
+                                    print(url_link)
                             else:
-                              print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                              print(url_link)
+                                with open("растровый6.png", "rb") as image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image,
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                print(
+                                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                                )
+                                print(url_link)
                     else:
                         print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
                         if response.status_code == 200:
-                          soup = BeautifulSoup(response.content, 'html.parser')
-                          image = soup.find("meta", property="og:image")
-                          if image:
-                              await self.send_photo(message.chat.id,
-                              image['content'],
-                              f'[{title}]({url})',
-                              parse_mode='MarkdownV2',
-                              reply_markup=markup)
-                          else:
-                            print("Нет картинки")
-                            print(url_link)
+                            soup = BeautifulSoup(response.content,
+                                                 'html.parser')
+                            image = soup.find("meta", property="og:image")
+                            if image:
+                                await self.send_photo(message.chat.id,
+                                                      image['content'],
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2',
+                                                      reply_markup=markup)
+                            else:
+                                with open("растровый6.png", "rb") as image:
+                                    await self.send_photo(
+                                        message.chat.id,
+                                        image,
+                                        f'[{title}]({url})',
+                                        parse_mode='MarkdownV2',
+                                        reply_markup=markup)
+                                print("Нет картинки")
+                                print(url_link)
                         else:
-                          print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                          print(url_link)
+                            with open("растровый6.png", "rb") as image:
+                                await self.send_photo(message.chat.id,
+                                                      image,
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2',
+                                                      reply_markup=markup)
+                            print(
+                                f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                            )
+                            print(url_link)
                 self.list_of_data[message.chat.id]["count"] += 20
                 await self.send_message(
                     message.chat.id,
@@ -385,48 +495,72 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                 soup = BeautifulSoup(response.content, 'html.parser')
                 image = soup.find("meta", property="og:image")
                 if image:
-                    await self.send_photo(message.chat.id,  
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2')
+                    await self.send_photo(message.chat.id,
+                                          image['content'],
+                                          f'[{title}]({url})',
+                                          parse_mode='MarkdownV2')
                 else:
                     print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
                     if response.status_code == 200:
-                      soup = BeautifulSoup(response.content, 'html.parser')
-                      image = soup.find("meta", property="og:image")
-                      if image:
-                          await self.send_photo(message.chat.id,
-                          image['content'],
-                          f'[{title}]({url})',
-                          parse_mode='MarkdownV2')
-                      else:
-                        print("Нет картинки")
-                        print(url_link)
+                        soup = BeautifulSoup(response.content, 'html.parser')
+                        image = soup.find("meta", property="og:image")
+                        if image:
+                            await self.send_photo(message.chat.id,
+                                                  image['content'],
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2')
+                        else:
+                            with open("растровый6.png", "rb") as image:
+                                await self.send_photo(message.chat.id,
+                                                      image,
+                                                      f'[{title}]({url})',
+                                                      parse_mode='MarkdownV2')
+                            print("Нет картинки")
+                            print(url_link)
                     else:
-                      print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                      print(url_link)
+                        with open("растровый6.png", "rb") as image:
+                            await self.send_photo(message.chat.id,
+                                                  image,
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2')
+                        print(
+                            f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                        )
+                        print(url_link)
             else:
                 print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
                 if response.status_code == 200:
-                  soup = BeautifulSoup(response.content, 'html.parser')
-                  image = soup.find("meta", property="og:image")
-                  if image:
-                      await self.send_photo(message.chat.id,
-                      image['content'],
-                      f'[{title}]({url})',
-                      parse_mode='MarkdownV2')
-                  else:
-                    print("Нет картинки")
-                    print(url_link)
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    image = soup.find("meta", property="og:image")
+                    if image:
+                        await self.send_photo(message.chat.id,
+                                              image['content'],
+                                              f'[{title}]({url})',
+                                              parse_mode='MarkdownV2')
+                    else:
+                        with open("растровый6.png", "rb") as image:
+                            await self.send_photo(message.chat.id,
+                                                  image,
+                                                  f'[{title}]({url})',
+                                                  parse_mode='MarkdownV2')
+                        print("Нет картинки")
+                        print(url_link)
                 else:
-                  print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
-                  print(url_link)
+                    with open("растровый6.png", "rb") as image:
+                        await self.send_photo(message.chat.id,
+                                              image,
+                                              f'[{title}]({url})',
+                                              parse_mode='MarkdownV2')
+                    print(
+                        f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                    )
+                    print(url_link)
             if self.list_of_data[message.chat.id]["all_articles"]["articles"][
                     i] == self.list_of_data[
                         message.chat.id]["all_articles"]["articles"][-1]:
@@ -442,8 +576,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             self.list_of_data[message.chat.id]["count"] = 0
             markup = self.buttons(message)
             await self.send_message(message.chat.id,
-                              "Все новости выведены.",
-                              reply_markup=markup)
+                                    "Все новости выведены.",
+                                    reply_markup=markup)
 
     async def set_sorces(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -454,8 +588,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
         button5 = telebot.types.KeyboardButton("Все источники")
         markup.add(button, button2, button3, button4, button5)
         await self.send_message(message.chat.id,
-                          "Выбирите источник",
-                          reply_markup=markup)
+                                "Выбирите источник",
+                                reply_markup=markup)
 
     async def set_sorces2(self, message: telebot.types.Message):
         if message.text in self.list_of_sorces and self.list_of_data[
@@ -486,8 +620,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             button3 = telebot.types.KeyboardButton("/more_news")
             markup.add(button3)
             await self.send_message(message.chat.id,
-                              "Источник задан.",
-                              reply_markup=markup)
+                                    "Источник задан.",
+                                    reply_markup=markup)
 
     async def set_category(self, message: telebot.types.Message):
         markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -502,8 +636,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
         markup.add(button, button2, button3, button4, button5, button6,
                    button7, button8)
         await self.send_message(message.chat.id,
-                          "Выбирите категорию",
-                          reply_markup=markup)
+                                "Выбирите категорию",
+                                reply_markup=markup)
 
     async def set_category2(self, message: telebot.types.Message):
         if message.text in self.list_of_categorys:
@@ -532,8 +666,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
         button = telebot.types.KeyboardButton("Без ключевого слова")
         markup.add(button)
         await self.send_message(message.chat.id,
-                          "Введите ключевое слово",
-                          reply_markup=markup)
+                                "Введите ключевое слово",
+                                reply_markup=markup)
 
     async def set_q2(self, message: telebot.types.Message):
         self.list_of_data[message.chat.id]["flag_for_q"] = False
@@ -564,8 +698,8 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             button3 = telebot.types.KeyboardButton("/more_news")
             markup.add(button3)
             await self.send_message(message.chat.id,
-                              "Ключевое слово задано.",
-                              reply_markup=markup)
+                                    "Ключевое слово задано.",
+                                    reply_markup=markup)
 
     async def run(self):
         self.register_message_handler(self.start_command, commands=["start"])
