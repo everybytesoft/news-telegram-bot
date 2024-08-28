@@ -1,13 +1,12 @@
-import telebot
+import asyncio
+from telebot.async_telebot import AsyncTeleBot
 from newsapi import NewsApiClient
-from time import sleep
-from threading import Thread
 import re
 from bs4 import BeautifulSoup
 import requests
 
 
-class NewsBotForChannel_ru(telebot.TeleBot):
+class NewsBotForChannel_ru(AsyncTeleBot):
 
   def __init__(self, token):
     super().__init__(token)
@@ -16,19 +15,19 @@ class NewsBotForChannel_ru(telebot.TeleBot):
     self.flag = True
     self.flag2 = True
 
-  def escape_md(self, text: str) -> str:
-    if text != None:
+  def escape_md(self, text: str):
+    if text:
       escape_chars = r'_*[]()~`>#+-=|{}.!'
       return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
-  def escape_md_text_link(self, text: str) -> str:
-    if text != None:
+  def escape_md_text_link(self, text: str):
+    if text:
       escape_chars = r'\)'
       return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
 
-  def send_news(self, Chat_id):
+  async def send_news(self, Chat_id):
     while True:
-      top_headlines = self.newsapi.get_top_headlines(language="ru" )
+      top_headlines = self.newsapi.get_top_headlines(language="ru")
       for i in range(len(top_headlines['articles'])):
         if top_headlines["articles"][i]["url"] not in self.list_of_used_news:
           data = top_headlines['articles'][i]
@@ -39,10 +38,10 @@ class NewsBotForChannel_ru(telebot.TeleBot):
             soup = BeautifulSoup(response.content, 'html.parser')
             image = soup.find("meta", property="og:image")
             if image:
-              self.send_photo(Chat_id,
-                              image['content'],
-                              f'[{title}]({url})',
-                              parse_mode='MarkdownV2')
+              await self.send_photo(Chat_id,
+                                    image['content'],
+                                    f'[{title}]({url})',
+                                    parse_mode='MarkdownV2')
             else:
               url2 = url[8:]
               url_link = url[:8] + url2[:url2.find("/")]
@@ -51,15 +50,17 @@ class NewsBotForChannel_ru(telebot.TeleBot):
                 soup = BeautifulSoup(response.content, 'html.parser')
                 image = soup.find("meta", property="og:image")
                 if image:
-                  self.send_photo(Chat_id,
-                    image['content'],
-                    f'[{title}]({url_link})',
-                    parse_mode='MarkdownV2')
+                  await self.send_photo(Chat_id,
+                                        image['content'],
+                                        f'[{title}]({url_link})',
+                                        parse_mode='MarkdownV2')
                 else:
                   print("Нет картинки")
                   print(url_link)
               else:
-                print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+                print(
+                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                )
                 print(url_link)
           else:
             url2 = url[8:]
@@ -69,25 +70,28 @@ class NewsBotForChannel_ru(telebot.TeleBot):
               soup = BeautifulSoup(response.content, 'html.parser')
               image = soup.find("meta", property="og:image")
               if image:
-                self.send_photo(Chat_id,
-                  image['content'],
-                  f'[{title}]({url_link})',
-                  parse_mode='MarkdownV2')
+                await self.send_photo(Chat_id,
+                                      image['content'],
+                                      f'[{title}]({url_link})',
+                                      parse_mode='MarkdownV2')
               else:
                 print("Нет картинки")
                 print(url_link)
             else:
-              print(f"Не удалось загрузить страницу. Код ошибки: {response.status_code}")
+              print(
+                  f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+              )
               print(url_link)
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
-      sleep(900)
+      await asyncio.sleep(900)
 
-  def Clear_list(self):
+  async def Clear_list(self):
     while True:
-      sleep(86400)
+      await asyncio.sleep(86400)
       del self.list_of_used_news[0:len(self.list_of_used_news) - 20]
 
-  def run(self):
-    Thread(target=self.Clear_list).start()
-    self.send_news(-1002147192937)
-    self.polling(none_stop=True, interval=0)
+  async def run(self):
+    task1 = asyncio.create_task(self.Clear_list())
+    task2 = asyncio.create_task(self.send_news(-1002147192937))
+    await asyncio.gather(task1, task2)
+    await self.polling(none_stop=True, interval=0)
