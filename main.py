@@ -1,14 +1,19 @@
+import asyncio
 from NewsBot import NewsBot
 from NewsBotForChannel_ru import NewsBotForChannel_ru
-from threading import Thread
 
 
-def main() -> None:
+async def main() -> None:
     bot = NewsBot('6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE')
-    bot2 = NewsBotForChannel_ru('6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE')
-    Thread(target=bot.run).start()
-    Thread(target=bot2.run).start()
+    bot2 = NewsBotForChannel_ru(
+        '6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE')
+
+    # Запускаем оба бота параллельно
+    await asyncio.gather(
+        bot2.run(),
+        bot.run(),
+    )
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
