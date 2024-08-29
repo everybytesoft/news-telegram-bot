@@ -43,7 +43,6 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                     f'[{title}]({url})',
                                     parse_mode='MarkdownV2')
             else:
-              print(url)
               url2 = url[8:]
               url_link = url[:8] + url2[:url2.find("/")]
               response = requests.get(url_link)
@@ -61,20 +60,13 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                           image,
                                           f'[{title}]({url})',
                                           parse_mode='MarkdownV2')
-                  print("Нет картинки")
-                  print(url_link)
               else:
                 with open("растровый6.png", "rb") as image:
                   await self.send_photo(Chat_id,
                                         image,
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2')
-                print(
-                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                )
-                print(url_link)
           else:
-            print(url)
             url2 = url[8:]
             url_link = url[:8] + url2[:url2.find("/")]
             response = requests.get(url_link)
@@ -92,18 +84,12 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                         image,
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2')
-                print("Нет картинки")
-                print(url_link)
             else:
               with open("растровый6.png", "rb") as image:
                 await self.send_photo(Chat_id,
                                       image,
                                       f'[{title}]({url})',
                                       parse_mode='MarkdownV2')
-              print(
-                  f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-              )
-              print(url_link)
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
       await asyncio.sleep(900)
 
