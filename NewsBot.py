@@ -162,7 +162,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                           parse_mode='MarkdownV2',
                                           reply_markup=markup)
                 else:
-                    print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
@@ -182,8 +181,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                       f'[{title}]({url})',
                                                       parse_mode='MarkdownV2',
                                                       reply_markup=markup)
-                            print("Нет картинки")
-                            print(url_link)
                     else:
                         with open("растровый6.png", "rb") as image:
                             await self.send_photo(message.chat.id,
@@ -191,12 +188,7 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                   f'[{title}]({url})',
                                                   parse_mode='MarkdownV2',
                                                   reply_markup=markup)
-                        print(
-                            f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                        )
-                        print(url_link)
             else:
-                print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
@@ -216,8 +208,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                   f'[{title}]({url})',
                                                   parse_mode='MarkdownV2',
                                                   reply_markup=markup)
-                        print("Нет картинки")
-                        print(url_link)
                 else:
                     with open("растровый6.png", "rb") as image:
                         await self.send_photo(message.chat.id,
@@ -225,10 +215,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                               f'[{title}]({url})',
                                               parse_mode='MarkdownV2',
                                               reply_markup=markup)
-                    print(
-                        f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                    )
-                    print(url_link)
         if len(self.list_of_data[message.chat.id]['top_headlines']
                ['articles']) == 0:
             await self.send_message(
@@ -301,7 +287,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                   parse_mode='MarkdownV2',
                                                   reply_markup=markup)
                         else:
-                            print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
@@ -324,8 +309,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                             f'[{title}]({url})',
                                             parse_mode='MarkdownV2',
                                             reply_markup=markup)
-                                    print("Нет картинки")
-                                    print(url_link)
                             else:
                                 with open("растровый6.png", "rb") as image:
                                     await self.send_photo(
@@ -334,12 +317,7 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2',
                                         reply_markup=markup)
-                                print(
-                                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                                )
-                                print(url_link)
                     else:
-                        print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
@@ -361,8 +339,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2',
                                         reply_markup=markup)
-                                print("Нет картинки")
-                                print(url_link)
                         else:
                             with open("растровый6.png", "rb") as image:
                                 await self.send_photo(message.chat.id,
@@ -370,10 +346,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                       f'[{title}]({url})',
                                                       parse_mode='MarkdownV2',
                                                       reply_markup=markup)
-                            print(
-                                f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                            )
-                            print(url_link)
                 await self.send_message(message.chat.id,
                                         "Все новости выведены.",
                                         reply_markup=markup)
@@ -398,7 +370,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                   parse_mode='MarkdownV2',
                                                   reply_markup=markup)
                         else:
-                            print(url)
                             url2 = url[8:]
                             url_link = url[:8] + url2[:url2.find("/")]
                             response = requests.get(url_link)
@@ -421,8 +392,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                             f'[{title}]({url})',
                                             parse_mode='MarkdownV2',
                                             reply_markup=markup)
-                                    print("Нет картинки")
-                                    print(url_link)
                             else:
                                 with open("растровый6.png", "rb") as image:
                                     await self.send_photo(
@@ -431,12 +400,7 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2',
                                         reply_markup=markup)
-                                print(
-                                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                                )
-                                print(url_link)
                     else:
-                        print(url)
                         url2 = url[8:]
                         url_link = url[:8] + url2[:url2.find("/")]
                         response = requests.get(url_link)
@@ -458,8 +422,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2',
                                         reply_markup=markup)
-                                print("Нет картинки")
-                                print(url_link)
                         else:
                             with open("растровый6.png", "rb") as image:
                                 await self.send_photo(message.chat.id,
@@ -467,10 +429,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                       f'[{title}]({url})',
                                                       parse_mode='MarkdownV2',
                                                       reply_markup=markup)
-                            print(
-                                f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                            )
-                            print(url_link)
                 self.list_of_data[message.chat.id]["count"] += 20
                 await self.send_message(
                     message.chat.id,
@@ -500,7 +458,6 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                           f'[{title}]({url})',
                                           parse_mode='MarkdownV2')
                 else:
-                    print(url)
                     url2 = url[8:]
                     url_link = url[:8] + url2[:url2.find("/")]
                     response = requests.get(url_link)
@@ -518,20 +475,13 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                       image,
                                                       f'[{title}]({url})',
                                                       parse_mode='MarkdownV2')
-                            print("Нет картинки")
-                            print(url_link)
                     else:
                         with open("растровый6.png", "rb") as image:
                             await self.send_photo(message.chat.id,
                                                   image,
                                                   f'[{title}]({url})',
                                                   parse_mode='MarkdownV2')
-                        print(
-                            f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                        )
-                        print(url_link)
             else:
-                print(url)
                 url2 = url[8:]
                 url_link = url[:8] + url2[:url2.find("/")]
                 response = requests.get(url_link)
@@ -549,18 +499,12 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                                                   image,
                                                   f'[{title}]({url})',
                                                   parse_mode='MarkdownV2')
-                        print("Нет картинки")
-                        print(url_link)
                 else:
                     with open("растровый6.png", "rb") as image:
                         await self.send_photo(message.chat.id,
                                               image,
                                               f'[{title}]({url})',
                                               parse_mode='MarkdownV2')
-                    print(
-                        f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
-                    )
-                    print(url_link)
             if self.list_of_data[message.chat.id]["all_articles"]["articles"][
                     i] == self.list_of_data[
                         message.chat.id]["all_articles"]["articles"][-1]:
