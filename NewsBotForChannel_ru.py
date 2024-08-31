@@ -4,6 +4,7 @@ from newsapi import NewsApiClient
 import re
 from bs4 import BeautifulSoup
 import requests
+from SearchingFromGoogle import get_html
 
 
 class NewsBotForChannel_ru(AsyncTeleBot):
@@ -33,6 +34,12 @@ class NewsBotForChannel_ru(AsyncTeleBot):
           data = top_headlines['articles'][i]
           title = self.escape_md(data['title'])
           url = self.escape_md_text_link(data['url'])
+          if url is not None and "news.google.com" in url:
+            url = await get_html(title)
+            if url:
+              url = self.escape_md_text_link(url)
+            else:
+              continue
           response = requests.get(url)
           if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -43,6 +50,7 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                     f'[{title}]({url})',
                                     parse_mode='MarkdownV2')
             else:
+              print(url)
               url2 = url[8:]
               url_link = url[:8] + url2[:url2.find("/")]
               response = requests.get(url_link)
@@ -60,13 +68,20 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                           image,
                                           f'[{title}]({url})',
                                           parse_mode='MarkdownV2')
+                  print("Нет картинки")
+                  print(url_link)
               else:
                 with open("растровый6.png", "rb") as image:
                   await self.send_photo(Chat_id,
                                         image,
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2')
+                print(
+                    f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+                )
+                print(url_link)
           else:
+            print(url)
             url2 = url[8:]
             url_link = url[:8] + url2[:url2.find("/")]
             response = requests.get(url_link)
@@ -84,12 +99,18 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                                         image,
                                         f'[{title}]({url})',
                                         parse_mode='MarkdownV2')
+                print("Нет картинки")
+                print(url_link)
             else:
               with open("растровый6.png", "rb") as image:
                 await self.send_photo(Chat_id,
                                       image,
                                       f'[{title}]({url})',
                                       parse_mode='MarkdownV2')
+              print(
+                  f"Не удалось загрузить страницу. Код ошибки: {response.status_code}"
+              )
+              print(url_link)
           self.list_of_used_news.append(top_headlines["articles"][i]["url"])
       await asyncio.sleep(900)
 
@@ -103,3 +124,4 @@ class NewsBotForChannel_ru(AsyncTeleBot):
     task2 = asyncio.create_task(self.send_news(-1002147192937))
     await asyncio.gather(task1, task2)
     await self.polling(none_stop=True, interval=0)
+
