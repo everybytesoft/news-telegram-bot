@@ -27,7 +27,9 @@ class NewsBotForChannel_ru(AsyncTeleBot):
 
     async def send_news(self, Chat_id):
         while True:
-            top_headlines = self.newsapi.latest_api(country="ru", image=True)
+            top_headlines = self.newsapi.latest_api(
+                country="ru", image=True, language="ru"
+            )
             for i in range(len(top_headlines["results"])):
                 if top_headlines["results"][i]["link"] not in self.list_of_used_news:
                     data = top_headlines["results"][i]
@@ -40,7 +42,7 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                         parse_mode="MarkdownV2",
                     )
                     self.list_of_used_news.append(top_headlines["results"][i]["link"])
-            await asyncio.sleep(900)
+                await asyncio.sleep(360)
 
     async def Clear_list(self):
         while True:
