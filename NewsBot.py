@@ -38,7 +38,9 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             return re.sub(f"([{re.escape(escape_chars)}])", r"\\\1", text)
         return text
 
-    async def start_command(self, message: telebot.async_telebot.types.Message):
+    async def start_command(
+        self, message: telebot.async_telebot.types.Message
+    ):
         self.list_of_data[message.chat.id] = {
             "top_headlines": {},
             "all_articles": {},
@@ -49,7 +51,9 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
             "q": None,
             "sources": None,
         }
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True
+        )
         button = telebot.async_telebot.types.KeyboardButton("/set_sources")
         button2 = telebot.async_telebot.types.KeyboardButton("/set_category")
         button3 = telebot.async_telebot.types.KeyboardButton("/set_keyword")
@@ -75,7 +79,9 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
 
     async def check_news(self, message: telebot.types.Message):
         self.list_of_data[message.chat.id]["more_news"] = False
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True
+        )
         button = telebot.async_telebot.types.KeyboardButton("/set_sources")
         button2 = telebot.async_telebot.types.KeyboardButton("/set_category")
         button3 = telebot.async_telebot.types.KeyboardButton("/set_keyword")
@@ -91,7 +97,9 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
         )
 
     async def get_news(self, message: telebot.types.Message):
-        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup = telebot.async_telebot.types.ReplyKeyboardMarkup(
+            resize_keyboard=True
+        )
         button = telebot.async_telebot.types.KeyboardButton("/set_sources")
         button2 = telebot.async_telebot.types.KeyboardButton("/set_category")
         button3 = telebot.async_telebot.types.KeyboardButton("/set_keyword")
@@ -109,21 +117,34 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                 )
             )
             for i in range(
-                len(self.list_of_data[message.chat.id]["top_headlines"]["results"])
+                len(
+                    self.list_of_data[message.chat.id]["top_headlines"][
+                        "results"
+                    ]
+                )
             ):
-                data = self.list_of_data[message.chat.id]["top_headlines"]["results"][i]
+                data = self.list_of_data[message.chat.id]["top_headlines"][
+                    "results"
+                ][i]
                 title = self.escape_md(data["title"])
                 url = self.escape_md_text_link(data["link"])
                 await self.send_photo(
                     message.chat.id,
-                    self.list_of_data[message.chat.id]["top_headlines"]["results"][i][
-                        "image_url"
-                    ],
+                    self.list_of_data[message.chat.id]["top_headlines"][
+                        "results"
+                    ][i]["image_url"],
                     f"[{title}]({url})",
                     parse_mode="MarkdownV2",
                     reply_markup=markup,
                 )
-            if len(self.list_of_data[message.chat.id]["top_headlines"]["results"]) == 0:
+            if (
+                len(
+                    self.list_of_data[message.chat.id]["top_headlines"][
+                        "results"
+                    ]
+                )
+                == 0
+            ):
                 await self.send_message(
                     message.chat.id,
                     "По вашему запросу ничего не найдено. Попробуйте другой запрос, или подождите некоторое время, когда новости по вашим параметрам появятся",
@@ -198,14 +219,20 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
 
     async def set_category2(self, message: telebot.types.Message):
         if message.text in self.list_of_categories:
-            self.list_of_data[message.chat.id]["category"] = self.list_of_categories[
-                message.text
-            ]
+            self.list_of_data[message.chat.id]["category"] = (
+                self.list_of_categories[message.text]
+            )
             markup = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
             button = telebot.async_telebot.types.KeyboardButton("/set_sources")
-            button2 = telebot.async_telebot.types.KeyboardButton("/set_category")
-            button3 = telebot.async_telebot.types.KeyboardButton("/set_keyword")
-            button4 = telebot.async_telebot.types.KeyboardButton("/get_filters")
+            button2 = telebot.async_telebot.types.KeyboardButton(
+                "/set_category"
+            )
+            button3 = telebot.async_telebot.types.KeyboardButton(
+                "/set_keyword"
+            )
+            button4 = telebot.async_telebot.types.KeyboardButton(
+                "/get_filters"
+            )
             button5 = telebot.async_telebot.types.KeyboardButton("/get_news")
             markup.add(button, button2, button3, button4, button5)
             await self.send_message(
@@ -245,15 +272,21 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
 
     async def run(self):
         self.register_message_handler(self.start_command, commands=["start"])
-        self.register_message_handler(self.check_news, commands=["get_filters"])
+        self.register_message_handler(
+            self.check_news, commands=["get_filters"]
+        )
         self.register_message_handler(self.get_news, commands=["get_news"])
-        self.register_message_handler(self.set_sources, commands=["set_sources"])
+        self.register_message_handler(
+            self.set_sources, commands=["set_sources"]
+        )
         self.register_message_handler(
             self.set_sources2,
             func=lambda message: True
             and self.list_of_data[message.chat.id]["flag_for_source"] is True,
         )
-        self.register_message_handler(self.set_category, commands=["set_category"])
+        self.register_message_handler(
+            self.set_category, commands=["set_category"]
+        )
         self.register_message_handler(
             self.set_category2,
             func=lambda message: message.text in self.list_of_categories,
