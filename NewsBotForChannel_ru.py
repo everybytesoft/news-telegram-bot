@@ -28,10 +28,17 @@ class NewsBotForChannel_ru(AsyncTeleBot):
     async def send_news(self, Chat_id):
         while True:
             top_headlines = self.newsapi.latest_api(
-                country="ru", image=True, language="ru"
+                country="ru",
+                image=True,
+                language="ru",
+                excludedomain="english.pravda.ru, russian.rt.com, aif.ru, iz.ru, eadaily.com",
             )
+
             for i in range(len(top_headlines["results"])):
-                if top_headlines["results"][i]["link"] not in self.list_of_used_news:
+                if (
+                    top_headlines["results"][i]["link"]
+                    not in self.list_of_used_news
+                ):
                     data = top_headlines["results"][i]
                     title = self.escape_md(data["title"])
                     url = self.escape_md_text_link(data["link"])
@@ -41,8 +48,12 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                         f"[{title}]({url})",
                         parse_mode="MarkdownV2",
                     )
-                    self.list_of_used_news.append(top_headlines["results"][i]["link"])
-                await asyncio.sleep(360)
+                    print(top_headlines["results"][i]["source_name"])
+                    self.list_of_used_news.append(
+                        top_headlines["results"][i]["link"]
+                    )
+
+            await asyncio.sleep(3600)
 
     async def Clear_list(self):
         while True:
@@ -51,6 +62,6 @@ class NewsBotForChannel_ru(AsyncTeleBot):
 
     async def run(self):
         task1 = asyncio.create_task(self.Clear_list())
-        task2 = asyncio.create_task(self.send_news(-1002147192937))
+        task2 = asyncio.create_task(self.send_news(-1002748974907))
         await asyncio.gather(task1, task2)
         await self.polling(none_stop=True, interval=0)
