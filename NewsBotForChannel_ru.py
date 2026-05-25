@@ -1,5 +1,6 @@
 import asyncio
 from telebot.async_telebot import AsyncTeleBot
+from telebot.asyncio_helper import ApiTelegramException
 from newsdataapi import NewsDataApiClient
 import re
 
@@ -42,12 +43,19 @@ class NewsBotForChannel_ru(AsyncTeleBot):
                     data = top_headlines["results"][i]
                     title = self.escape_md(data["title"])
                     url = self.escape_md_text_link(data["link"])
-                    await self.send_photo(
-                        Chat_id,
-                        top_headlines["results"][i]["image_url"],
-                        f"[{title}]({url})",
-                        parse_mode="MarkdownV2",
-                    )
+                    try:
+                        await self.send_photo(
+                            Chat_id,
+                            top_headlines["results"][i]["image_url"],
+                            f"[{title}]({url})",
+                            parse_mode="MarkdownV2",
+                        )
+                    except ApiTelegramException:
+                        await self.send_message(
+                            Chat_id,
+                            f"[{title}]({url})",
+                            parse_mode="MarkdownV2",
+                        )
                     print(top_headlines["results"][i]["source_name"])
                     self.list_of_used_news.append(
                         top_headlines["results"][i]["link"]
