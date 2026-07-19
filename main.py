@@ -4,12 +4,12 @@ from NewsBotForChannel_ru import NewsBotForChannel_ru
 
 
 async def main() -> None:
-    bot = NewsBot("6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE")
+    # bot = NewsBot("6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE")
     bot2 = NewsBotForChannel_ru(
         "6781204411:AAHxbmARcWtjT-dBcdTJqubLpuI1LG3-SfE",
     )
 
-    await asyncio.gather(bot.run(), bot2.run())
+    await asyncio.gather(bot2.run())
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import asyncio
 import telebot.async_telebot
+from telebot.asyncio_helper import ApiTelegramException
 from newsdataapi import NewsDataApiClient
 import re
 
@@ -128,15 +129,23 @@ class NewsBot(telebot.async_telebot.AsyncTeleBot):
                 ][i]
                 title = self.escape_md(data["title"])
                 url = self.escape_md_text_link(data["link"])
-                await self.send_photo(
-                    message.chat.id,
-                    self.list_of_data[message.chat.id]["top_headlines"][
-                        "results"
-                    ][i]["image_url"],
-                    f"[{title}]({url})",
-                    parse_mode="MarkdownV2",
-                    reply_markup=markup,
-                )
+                try:
+                    await self.send_photo(
+                        message.chat.id,
+                        self.list_of_data[message.chat.id]["top_headlines"][
+                            "results"
+                        ][i]["image_url"],
+                        f"[{title}]({url})",
+                        parse_mode="MarkdownV2",
+                        reply_markup=markup,
+                    )
+                except ApiTelegramException:
+                    await self.send_message(
+                        message.chat.id,
+                        f"[{title}]({url})",
+                        parse_mode="MarkdownV2",
+                        reply_markup=markup,
+                    )
             if (
                 len(
                     self.list_of_data[message.chat.id]["top_headlines"][
